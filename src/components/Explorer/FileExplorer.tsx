@@ -29,7 +29,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({
   const currentDir = getNodeByPath(root, explorerCwd) || getNodeByPath(root, terminalCwd);
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-slate-900/60 overflow-hidden border-r border-slate-800">
+    <div className="flex-1 flex flex-col h-full bg-[#f8f5f0] text-[#2c1d0e] overflow-hidden border-r border-[#dfd5c7]">
       {/* Top Address & Navigation Bar (Views explorerCwd) */}
       <AddressBar
         cwd={explorerCwd}

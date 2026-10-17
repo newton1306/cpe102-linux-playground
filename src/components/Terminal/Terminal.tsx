@@ -35,22 +35,67 @@ export const Terminal: React.FC<TerminalProps> = ({
   // Global keydown listener so user can start typing anytime without manual focus
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept if inside an input or if modifier keys (Ctrl, Alt, Meta) pressed
+      // Don't intercept if modifier keys (except Ctrl+L which is handled)
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+      // If activeElement is another text input/textarea outside terminal, don't intercept
       if (
-        document.activeElement === inputRef.current ||
-        (document.activeElement && document.activeElement.tagName === 'INPUT')
+        document.activeElement &&
+        document.activeElement !== inputRef.current &&
+        (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')
       ) {
         return;
       }
-      if (e.ctrlKey || e.altKey || e.metaKey) return;
-      if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Tab') {
+
+      // If terminal input is not currently focused, focus it and forward the key!
+      if (document.activeElement !== inputRef.current) {
         inputRef.current?.focus({ preventScroll: true });
+
+        // Forward single character typing
+        if (e.key.length === 1) {
+          e.preventDefault();
+          setInputVal((prev) => {
+            const next = prev + e.key;
+            setCaretPos(next.length);
+            return next;
+          });
+          return;
+        }
+
+        // Forward Backspace
+        if (e.key === 'Backspace') {
+          e.preventDefault();
+          setInputVal((prev) => {
+            const next = prev.slice(0, -1);
+            setCaretPos(next.length);
+            return next;
+          });
+          return;
+        }
+
+        // Forward Enter
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const cmd = inputVal.trim();
+          setHistoryIndex(null);
+          setInputVal('');
+          setCaretPos(0);
+          onExecute(cmd);
+          return;
+        }
+
+        // Forward Tab
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          handleTabCompletion();
+          return;
+        }
       }
     };
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
+  }, [inputVal, onExecute]);
 
   // Only auto-scroll to bottom when NEW commands are entered, allowing free manual scrolling anytime
   useEffect(() => {
@@ -61,11 +106,18 @@ export const Terminal: React.FC<TerminalProps> = ({
   }, [entries.length]);
 
   // Keep input focused when clicking inside terminal without disrupting scroll position
-  const handleContainerClick = (e: React.MouseEvent) => {
+  const handleContainerClick = (_e: React.MouseEvent) => {
     const selection = window.getSelection();
-    if (selection && selection.toString().length > 0) return;
+    if (selection && selection.toString().length > 0) {
+      // Check if selection was made inside the terminal output
+      if (!scrollAreaRef.current?.contains(selection.anchorNode)) {
+        // Selection is from outside (e.g. explorer file click), clear it and focus
+        selection.removeAllRanges();
+      } else {
+        return;
+      }
+    }
 
-    e.stopPropagation();
     inputRef.current?.focus({ preventScroll: true });
   };
 
@@ -319,15 +371,18 @@ export const Terminal: React.FC<TerminalProps> = ({
 
         {/* Active Command Line Input with Continuous Blinking Block Cursor */}
         <div
-          className="flex items-center flex-wrap pt-1 font-mono text-xs cursor-text"
+          className="flex items-center flex-wrap pt-1 font-mono text-xs cursor-text w-full"
           onClick={() => inputRef.current?.focus({ preventScroll: true })}
         >
-          <span className="text-emerald-400 font-bold">student@cpe102</span>
-          <span className="text-slate-500">:</span>
-          <span className="text-blue-400 font-bold">{currentPromptPath}</span>
-          <span className="text-slate-400 font-bold mr-1.5">$</span>
+          <span className="text-emerald-400 font-bold shrink-0">student@cpe102</span>
+          <span className="text-slate-500 shrink-0">:</span>
+          <span className="text-blue-400 font-bold shrink-0">{currentPromptPath}</span>
+          <span className="text-slate-400 font-bold mr-1.5 shrink-0">$</span>
 
-          <div className="relative inline-flex items-center min-w-[8px]">
+          <div
+            className="flex-1 min-w-[200px] relative flex items-center cursor-text"
+            onClick={() => inputRef.current?.focus({ preventScroll: true })}
+          >
             <input
               ref={inputRef}
               type="text"
@@ -337,6 +392,11 @@ export const Terminal: React.FC<TerminalProps> = ({
               onSelect={updateCaret}
               onKeyUp={updateCaret}
               onClick={updateCaret}
+              onFocus={(e) => {
+                const len = e.currentTarget.value.length;
+                const pos = caretPos <= len ? caretPos : len;
+                e.currentTarget.setSelectionRange(pos, pos);
+              }}
               className="absolute inset-0 opacity-0 w-full cursor-text z-10 caret-transparent font-mono text-xs"
               autoFocus
               spellCheck={false}

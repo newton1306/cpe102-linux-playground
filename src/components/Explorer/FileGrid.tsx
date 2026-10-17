@@ -45,34 +45,34 @@ export const FileGrid: React.FC<FileGridProps> = ({
 
   const getItemIcon = (item: VNode) => {
     if (item.type === 'dir') {
-      return <Folder className="w-8 h-8 text-cyan-400 fill-cyan-950/40" />;
+      return <Folder className="w-9 h-9 text-[#f59e0b] fill-[#fef3c7] stroke-[#b45309]" />;
     }
     if (item.name.startsWith('.')) {
-      return <Eye className="w-8 h-8 text-emerald-400/80 animate-pulse" />;
+      return <Eye className="w-9 h-9 text-[#d97706] animate-pulse" />;
     }
     if (item.name.endsWith('.py')) {
-      return <FileCode className="w-8 h-8 text-emerald-400" />;
+      return <FileCode className="w-9 h-9 text-[#0284c7] fill-[#f0f9ff]" />;
     }
     if (item.name.endsWith('.html') || item.name.endsWith('.css')) {
-      return <FileCode className="w-8 h-8 text-blue-400" />;
+      return <FileCode className="w-9 h-9 text-[#0284c7] fill-[#f0f9ff]" />;
     }
-    return <FileText className="w-8 h-8 text-slate-300" />;
+    return <FileText className="w-9 h-9 text-[#78716c] fill-[#fbfaf8]" />;
   };
 
   const getSmallItemIcon = (item: VNode) => {
     if (item.type === 'dir') {
-      return <Folder className="w-4 h-4 text-cyan-400 shrink-0" />;
+      return <Folder className="w-4 h-4 text-[#f59e0b] fill-[#fef3c7] stroke-[#b45309] shrink-0" />;
     }
     if (item.name.startsWith('.')) {
-      return <Eye className="w-4 h-4 text-emerald-400 shrink-0" />;
+      return <Eye className="w-4 h-4 text-[#d97706] shrink-0" />;
     }
     if (item.name.endsWith('.py')) {
-      return <FileCode className="w-4 h-4 text-emerald-400 shrink-0" />;
+      return <FileCode className="w-4 h-4 text-[#0284c7] shrink-0" />;
     }
     if (item.name.endsWith('.html') || item.name.endsWith('.css')) {
-      return <FileCode className="w-4 h-4 text-blue-400 shrink-0" />;
+      return <FileCode className="w-4 h-4 text-[#0284c7] shrink-0" />;
     }
-    return <File className="w-4 h-4 text-slate-400 shrink-0" />;
+    return <File className="w-4 h-4 text-[#78716c] shrink-0" />;
   };
 
   const formatSize = (bytes: number) => {
@@ -99,17 +99,17 @@ export const FileGrid: React.FC<FileGridProps> = ({
 
     // Hidden file revealed by ls -a
     if (item.name.startsWith('.') && lastAction.type === 'ls-a') {
-      return 'anim-ghost-reveal border-emerald-400 glow-green';
+      return 'anim-ghost-reveal border-amber-600 ring-2 ring-amber-500/50 bg-amber-50';
     }
 
     // Newly created file/folder
     if (isTarget && (lastAction.type === 'touch' || lastAction.type === 'mkdir')) {
-      return 'anim-pop border-emerald-400 glow-green';
+      return 'anim-pop border-emerald-600 ring-2 ring-emerald-500/50 bg-emerald-50';
     }
 
     // Read file via cat
     if (isTarget && lastAction.type === 'cat') {
-      return 'border-cyan-400 glow-cyan ring-1 ring-cyan-400';
+      return 'border-blue-600 ring-2 ring-blue-500/50 bg-blue-50';
     }
 
     return '';
@@ -117,11 +117,11 @@ export const FileGrid: React.FC<FileGridProps> = ({
 
   if (items.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center font-mono text-slate-500">
-        <Folder className="w-12 h-12 text-slate-700 mb-2 stroke-1" />
-        <p className="text-sm">This folder is empty</p>
-        <p className="text-xs text-slate-600 mt-1">
-          Use <code className="text-emerald-400 font-bold">touch &lt;filename&gt;</code> to create a file!
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center font-mono text-[#82715e] bg-[#fcfaf7]">
+        <Folder className="w-12 h-12 text-[#cbb9a3] mb-2 stroke-1" />
+        <p className="text-sm font-medium">This folder is empty</p>
+        <p className="text-xs text-[#9c8974] mt-1">
+          Use <code className="text-[#b45309] font-bold">touch &lt;filename&gt;</code> to create a file!
         </p>
       </div>
     );
@@ -130,8 +130,8 @@ export const FileGrid: React.FC<FileGridProps> = ({
   // Large Icons / Grid View
   if (viewMode === 'grid') {
     return (
-      <div className="flex-1 p-4 overflow-y-auto select-none">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      <div className="flex-1 p-4 overflow-y-auto select-none bg-[#fcfaf7]">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3.5">
           {items.map((item) => {
             const isHidden = item.name.startsWith('.');
             const isSelected = selectedNode?.id === item.id;
@@ -144,17 +144,17 @@ export const FileGrid: React.FC<FileGridProps> = ({
                 onDoubleClick={() => handleItemDoubleClick(item)}
                 className={`group relative flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all cursor-pointer font-mono ${
                   isSelected
-                    ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 shadow-md glow-green-sm'
+                    ? 'border-[#bfae96] bg-[#eae0d2] text-[#1c1208] shadow-sm ring-1 ring-[#bfae96]'
                     : isHidden
-                    ? 'border-dashed border-emerald-900/60 bg-emerald-950/10 text-emerald-400/70 hover:opacity-100 hover:border-emerald-500/50'
-                    : 'border-slate-800 bg-slate-900/60 text-slate-200 hover:border-slate-700 hover:bg-slate-800/60'
+                    ? 'border-dashed border-[#d8c8b4] bg-[#fbf8f2] text-[#5c4a38] hover:border-[#cbbaa5] hover:bg-[#f5efe6]'
+                    : 'border-[#e2d8cb] bg-white text-[#2c1d0e] hover:border-[#cbbaa5] hover:bg-[#f5efe6] shadow-xs'
                 } ${animClass}`}
               >
                 {/* Hidden File Status Badge */}
                 {isHidden && (
-                  <span className="absolute top-1.5 right-1.5 flex items-center gap-0.5 text-[9px] bg-emerald-950/80 text-emerald-400 px-1.5 py-0.2 rounded border border-emerald-500/40">
+                  <span className="absolute top-1.5 right-1.5 flex items-center gap-0.5 text-[9px] bg-[#fbf2e6] text-[#b45309] px-1.5 py-0.2 rounded border border-[#e8d5be]">
                     <Eye className="w-2.5 h-2.5" />
-                    <span>hidden item</span>
+                    <span>hidden</span>
                   </span>
                 )}
 
@@ -163,17 +163,20 @@ export const FileGrid: React.FC<FileGridProps> = ({
                   {getItemIcon(item)}
                 </div>
 
-                {/* Name: MUST NOT display filename if hidden */}
-                <span className="w-full truncate text-xs font-medium px-1">
+                {/* Name: Full filename + extension clearly visible without ellipsis */}
+                <span
+                  className="w-full text-xs font-medium px-1 text-center break-all leading-snug min-h-[2.5rem] flex items-center justify-center select-text"
+                  title={isHidden ? '[ Hidden Item ]' : item.name}
+                >
                   {isHidden ? (
-                    <span className="text-emerald-400/90 italic tracking-wider">[ Hidden Item ]</span>
+                    <span className="text-[#b45309] font-semibold italic tracking-wide">[ Hidden Item ]</span>
                   ) : (
-                    item.name
+                    <span className="text-[#2c1d0e]">{item.name}</span>
                   )}
                 </span>
 
                 {/* Subtitle / Type */}
-                <span className="text-[10px] text-slate-500 mt-1 truncate">
+                <span className="text-[10px] text-[#8c7965] mt-1 truncate">
                   {isHidden ? 'Hidden File' : item.type === 'dir' ? 'Folder' : formatSize(item.size)}
                 </span>
               </div>
@@ -186,17 +189,17 @@ export const FileGrid: React.FC<FileGridProps> = ({
 
   // Details View (Windows File Explorer Table Mode)
   return (
-    <div className="flex-1 overflow-y-auto select-none font-mono text-xs">
+    <div className="flex-1 overflow-y-auto select-none font-mono text-xs bg-[#fcfaf7]">
       <table className="w-full border-collapse text-left">
-        <thead className="sticky top-0 bg-slate-950 border-b border-slate-800 text-[11px] text-slate-500 uppercase tracking-wider">
+        <thead className="sticky top-0 bg-[#f0ebe1] border-b border-[#dfd5c7] text-[11px] text-[#7d6b58] uppercase tracking-wider">
           <tr>
-            <th className="py-2 px-3 font-semibold">Name</th>
-            <th className="py-2 px-3 font-semibold hidden sm:table-cell">Type</th>
-            <th className="py-2 px-3 font-semibold">Size</th>
-            <th className="py-2 px-3 font-semibold hidden md:table-cell">Permissions</th>
+            <th className="py-2.5 px-3 font-semibold">Name</th>
+            <th className="py-2.5 px-3 font-semibold hidden sm:table-cell">Type</th>
+            <th className="py-2.5 px-3 font-semibold">Size</th>
+            <th className="py-2.5 px-3 font-semibold hidden md:table-cell">Permissions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-850">
+        <tbody className="divide-y divide-[#eee6db]">
           {items.map((item) => {
             const isHidden = item.name.startsWith('.');
             const isSelected = selectedNode?.id === item.id;
@@ -209,32 +212,32 @@ export const FileGrid: React.FC<FileGridProps> = ({
                 onDoubleClick={() => handleItemDoubleClick(item)}
                 className={`transition-colors cursor-pointer ${
                   isSelected
-                    ? 'bg-emerald-950/50 text-emerald-300 font-semibold'
+                    ? 'bg-[#eae0d2] text-[#1c1208] font-semibold'
                     : isHidden
-                    ? 'bg-emerald-950/10 text-emerald-400/80 hover:bg-emerald-950/20'
-                    : 'text-slate-300 hover:bg-slate-900/80'
+                    ? 'bg-[#fcf9f2] text-[#7c634a] hover:bg-[#f5efe6]'
+                    : 'text-[#3d2f21] hover:bg-[#f6f0e6]'
                 } ${animClass}`}
               >
-                <td className="py-2 px-3 flex items-center gap-2">
+                <td className="py-2.5 px-3 flex items-center gap-2 max-w-[280px]">
                   {getSmallItemIcon(item)}
                   {isHidden ? (
-                    <span className="text-emerald-400/90 italic tracking-wider">[ Hidden Item ]</span>
+                    <span className="text-[#b45309] font-semibold italic tracking-wide">[ Hidden Item ]</span>
                   ) : (
-                    <span className="truncate">{item.name}</span>
+                    <span className="break-all font-medium select-text">{item.name}</span>
                   )}
                   {isHidden && (
-                    <span className="text-[9px] bg-emerald-950 text-emerald-400 px-1 py-0.2 rounded border border-emerald-500/40">
+                    <span className="text-[9px] bg-[#fbf2e6] text-[#b45309] px-1 py-0.2 rounded border border-[#e8d5be]">
                       hidden
                     </span>
                   )}
                 </td>
-                <td className="py-2 px-3 text-slate-500 hidden sm:table-cell">
+                <td className="py-2.5 px-3 text-[#7d6b58] hidden sm:table-cell">
                   {isHidden ? 'Hidden File' : item.type === 'dir' ? 'File Folder' : 'Document'}
                 </td>
-                <td className="py-2 px-3 text-slate-500">
+                <td className="py-2.5 px-3 text-[#7d6b58]">
                   {isHidden ? '—' : item.type === 'dir' ? '—' : formatSize(item.size)}
                 </td>
-                <td className="py-2 px-3 text-slate-600 hidden md:table-cell font-mono">
+                <td className="py-2.5 px-3 text-[#8c7965] hidden md:table-cell font-mono">
                   {item.permissions}
                 </td>
               </tr>

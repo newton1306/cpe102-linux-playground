@@ -31,17 +31,17 @@ export const AddressBar: React.FC<AddressBarProps> = ({
   }
 
   return (
-    <div className="flex flex-col border-b border-slate-800 bg-slate-900/90 font-mono text-xs select-none">
+    <div className="flex flex-col border-b border-[#dfd5c7] bg-[#f5efe6] font-mono text-xs select-none">
       {/* Top Controls Row */}
       <div className="flex items-center justify-between gap-2 px-3 py-2">
-        <div className="flex items-center gap-1 text-slate-400">
+        <div className="flex items-center gap-1 text-[#6b5845]">
           <button
             onClick={() => onNavigate(canGoUp ? parentPath : '/')}
             disabled={!canGoUp}
             className={`p-1.5 rounded transition-all ${
               canGoUp
-                ? 'hover:bg-slate-800 text-slate-200 hover:text-emerald-400 cursor-pointer active:scale-95'
-                : 'text-slate-600 cursor-not-allowed opacity-50'
+                ? 'hover:bg-[#e6dcce] text-[#3d2f21] hover:text-[#1f150b] cursor-pointer active:scale-95'
+                : 'text-[#baa794] cursor-not-allowed opacity-50'
             }`}
             title="Up to Parent Directory (cd ..)"
           >
@@ -49,7 +49,7 @@ export const AddressBar: React.FC<AddressBarProps> = ({
           </button>
           <button
             onClick={() => onNavigate(cwd)}
-            className="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-emerald-400 transition-all cursor-pointer"
+            className="p-1.5 rounded hover:bg-[#e6dcce] text-[#6b5845] hover:text-[#1f150b] transition-all cursor-pointer"
             title="Refresh View"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -57,20 +57,20 @@ export const AddressBar: React.FC<AddressBarProps> = ({
         </div>
 
         {/* Windows Explorer Style Address Bar */}
-        <div className="flex-1 flex items-center gap-1.5 overflow-x-auto rounded border border-slate-800 bg-slate-950 px-2.5 py-1 text-slate-300 shadow-inner">
-          <HardDrive className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+        <div className="flex-1 flex items-center gap-1.5 overflow-x-auto rounded border border-[#d6c7b2] bg-white px-2.5 py-1 text-[#2c1d0e] shadow-xs">
+          <HardDrive className="w-3.5 h-3.5 text-[#b45309] shrink-0" />
           <div className="flex items-center gap-1 flex-wrap">
             {breadcrumbList.map((crumb, idx) => {
               const isLast = idx === breadcrumbList.length - 1;
               return (
                 <React.Fragment key={crumb.fullPath}>
-                  {idx > 0 && <ChevronRight className="w-3 h-3 text-slate-600 shrink-0" />}
+                  {idx > 0 && <ChevronRight className="w-3 h-3 text-[#9c8974] shrink-0" />}
                   <button
                     onClick={() => onNavigate(crumb.fullPath)}
                     className={`px-1.5 py-0.5 rounded transition-colors cursor-pointer ${
                       isLast
-                        ? 'bg-emerald-950/60 text-emerald-400 font-semibold border border-emerald-500/30'
-                        : 'text-slate-400 hover:text-cyan-300 hover:bg-slate-800/80'
+                        ? 'bg-[#eadecc] text-[#2c1d0e] font-semibold border border-[#cdbfae]'
+                        : 'text-[#5c4a38] hover:text-[#1f150b] hover:bg-[#f2ece2]'
                     }`}
                   >
                     {crumb.name}
@@ -82,13 +82,13 @@ export const AddressBar: React.FC<AddressBarProps> = ({
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center border border-slate-800 rounded bg-slate-950 p-0.5">
+        <div className="flex items-center border border-[#d6c7b2] rounded bg-[#ebe2d5] p-0.5">
           <button
             onClick={() => onToggleViewMode('grid')}
             className={`p-1 rounded transition-colors ${
               viewMode === 'grid'
-                ? 'bg-emerald-500/20 text-emerald-400'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'bg-white text-[#8c5b24] shadow-xs font-semibold'
+                : 'text-[#82715e] hover:text-[#2c1d0e]'
             }`}
             title="Large Icons View"
           >
@@ -98,8 +98,8 @@ export const AddressBar: React.FC<AddressBarProps> = ({
             onClick={() => onToggleViewMode('details')}
             className={`p-1 rounded transition-colors ${
               viewMode === 'details'
-                ? 'bg-emerald-500/20 text-emerald-400'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'bg-white text-[#8c5b24] shadow-xs font-semibold'
+                : 'text-[#82715e] hover:text-[#2c1d0e]'
             }`}
             title="Details View"
           >

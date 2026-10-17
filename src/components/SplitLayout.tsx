@@ -13,8 +13,8 @@ export const SplitLayout: React.FC<SplitLayoutProps> = ({ leftPane, rightPane })
         {leftPane}
       </div>
 
-      {/* Center Divider with subtle glowing neon border */}
-      <div className="hidden md:block w-[1px] bg-emerald-500/30 glow-green-sm" />
+      {/* Center Divider cleanly separating Windows File Explorer and Ubuntu Terminal */}
+      <div className="hidden md:block w-[1px] bg-[#dfd5c7]" />
 
       {/* Right Pane (50%): Interactive Web Terminal */}
       <div className="w-full md:w-1/2 h-1/2 md:h-full flex flex-col overflow-hidden relative">

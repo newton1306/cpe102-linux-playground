@@ -8,40 +8,34 @@
 
 ---
 
-## 2. Changes in Revision 4
+## 2. Changes in Revision 5
 
-### 1) Authentic Terminal Blinking Cursor
-- **Behavior**: Single glowing green block cursor (`█`) rendered continuously right after the prompt (`$ `) or directly after currently typed text.
-- **Fix**: Replaced the previous trailing full-width input container layout with an inline cursor structure. Hidden transparent input with `caret-transparent` captures all keyboard and mobile inputs without showing duplicate carets.
-- **No Edge Drift**: Cursor never floats to the right edge.
+### 1) Light Brown Windows File Explorer Aesthetic (Left Pane Only)
+- **Theme**: Warm light brown / sand / beige palette inspired by Windows File Explorer.
+- **Components Styled**:
+  - `FileExplorer.tsx`: Warm parchment background (`#f8f5f0`) with soft tan border.
+  - `AddressBar.tsx`: Warm cream bar (`#f5efe6`) with crisp white address bar (`#ffffff`), warm amber drive icon, and tan breadcrumbs.
+  - `SidebarTree.tsx`: Light tan navigation tree pane (`#eee7dc`) with amber folder icons and brown active CWD badge.
+  - `FileGrid.tsx`: Warm off-white canvas (`#fcfaf7`) with white/tan cards and iconic golden manila folder icons (`#f59e0b` fill `#fef3c7`).
+  - `StatusBar.tsx`: Warm sand footer (`#eee7dd`) displaying item counts, selected node details, and terminal CWD pill.
+- **Right Pane Untouched**: Ubuntu Terminal remains authentic retro dark mode (`#05080f`) with glowing green neon accents.
 
-### 2) Ubuntu Bash Prompt Standardization
-- **Behavior**: When standing in `/home/student`, the prompt cleanly displays:
-  ```bash
-  student@cpe102:~$
-  ```
-  It maps `/home/student` strictly to `~` without displaying `student` as folder name.
-- When navigating into subdirectories, e.g. `cpe102`:
-  ```bash
-  student@cpe102:~/cpe102$
-  ```
-- When navigating to root (`/`):
-  ```bash
-  student@cpe102:/$
-  ```
+### 2) Fully Visible Filenames & Extensions (No Truncation)
+- **Problem Fixed**: Filenames were previously truncated with ellipsis (`...`) because of rigid card dimensions and `truncate` CSS.
+- **Solution**:
+  - Removed `truncate` class.
+  - Added `break-all leading-snug min-h-[2.5rem] flex items-center justify-center` so filenames and extensions (`.txt`, `.py`, `.c`, etc.) wrap cleanly onto multiple lines without cutting off.
+  - Adjusted grid column sizing to `repeat(auto-fill, minmax(120px, 1fr))` to provide ample card width.
+  - Added `title` tooltip on cards so users can inspect the full name on hover.
+  - In Table/Details view, filenames now wrap cleanly without ellipsis.
 
-### 3) One-Way Terminal-to-Explorer Interaction
-- **Terminal (Right) -> Explorer (Left)**:
-  - When commands are executed in the Terminal (e.g., `cd`, `touch`, `mkdir`, `rm`, `cp`, `mv`, `ls -a`), the Explorer automatically updates its view to the terminal CWD and triggers visual animations (green pop, ghost reveal, cat highlight).
-- **Explorer (Left) -> Terminal (Right)**:
-  - Clicking, double-clicking, or navigating folders in the Explorer only updates the left pane view for file inspection. It NEVER affects or changes the Terminal prompt or CWD.
-
-### 4) Freshman Welcome & Instruction in `welcome.txt`
-- `welcome.txt` now greets freshmen computer engineers warmly with essential starter commands (`pwd`, `ls`, `cat`, `cd`, `help`).
-- Does NOT give away secret flags or `-a`.
-
-### 5) 100% English Localization
-- All UI strings, terminal banners, command cheat sheets (`help`), address bars, modal dialogs, and status messages are 100% English.
+### 3) Terminal Control & Focus Fix (No Freeze when Clicking Files)
+- **Bug Fixed**: When typing text in terminal and then clicking a file card in File Explorer, the terminal input became unresponsive and required a page refresh.
+- **Root Cause & Fixes**:
+  - `handleContainerClick`: Previously returned early whenever any text selection existed on the page (`selection.toString().length > 0`), which permanently locked out clicks if text was selected in Explorer. Now only preserves internal drag selection within terminal output, ensuring clicks anywhere in the terminal immediately restore focus to the input.
+  - `handleGlobalKeyDown`: Now actively catches keystrokes when focus was left on an Explorer item, automatically focusing the input and forwarding characters, Backspace, Tab, and Enter so no keystroke is ever dropped.
+  - Active input line now spans the full width (`w-full`) with a flexible click capture area across the entire command prompt row.
+  - Added `onFocus` caret synchronization to preserve the exact typing cursor position when re-focusing.
 
 ---
 
