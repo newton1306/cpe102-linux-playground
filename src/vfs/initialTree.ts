@@ -97,11 +97,15 @@ Pro Tip: Watch the File Explorer on the left side update in real time!
     student.id
   );
 
-  // 2. .secret_1 (Scannable Rick Roll QR code, English header, no hint)
-  student.children['.secret_1'] = createFile(
-    '.secret_1',
+  // Obfuscated dynamic loading for Easter egg files (prevents AI web-scraping & static source leak)
+  const _d = (s: string) => atob(s);
+  const sec1 = _d('LnNlY3JldF8x');
+  const sec2 = _d('LnNlY3JldF8y');
+
+  student.children[sec1] = createFile(
+    sec1,
     ` __________________________________________________
-/ Congratulations! You discovered .secret_1!       \\
+/ Congratulations! You discovered ${sec1}!       \\
 \\ Scan the QR Code below to claim your surprise!   /
  --------------------------------------------------
 
@@ -110,11 +114,10 @@ ${RICK_ROLL_QR}
     student.id
   );
 
-  // 3. .secret_2 (Scannable Google.com QR code, English header)
-  student.children['.secret_2'] = createFile(
-    '.secret_2',
+  student.children[sec2] = createFile(
+    sec2,
     ` __________________________________________________
-/ Great job! You discovered .secret_2!             \\
+/ Great job! You discovered ${sec2}!             \\
 \\ Scan the QR Code below to open the URL!          /
  --------------------------------------------------
 

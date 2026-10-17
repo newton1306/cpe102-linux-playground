@@ -99,17 +99,17 @@ export const FileGrid: React.FC<FileGridProps> = ({
 
     // Hidden file revealed by ls -a
     if (item.name.startsWith('.') && lastAction.type === 'ls-a') {
-      return 'anim-ghost-reveal border-amber-600 ring-2 ring-amber-500/50 bg-amber-50';
+      return 'anim-ghost-reveal border-[#d97706] ring-2 ring-[#f59e0b]/50 bg-[#fef3c7]';
     }
 
     // Newly created file/folder
     if (isTarget && (lastAction.type === 'touch' || lastAction.type === 'mkdir')) {
-      return 'anim-pop border-emerald-600 ring-2 ring-emerald-500/50 bg-emerald-50';
+      return 'anim-pop border-[#d97706] ring-2 ring-[#f59e0b]/50 bg-[#fef9c3]';
     }
 
     // Read file via cat
     if (isTarget && lastAction.type === 'cat') {
-      return 'border-blue-600 ring-2 ring-blue-500/50 bg-blue-50';
+      return 'border-[#c2782b] ring-2 ring-[#c2782b]/40 bg-[#fdf5eb]';
     }
 
     return '';

@@ -169,7 +169,7 @@ export function executeCommand({ state, commandLine, onSecretFound }: ExecuteOpt
           errors.push(`cat: ${fileArg}: Is a directory`);
         } else {
           outputs.push(node.content);
-          if ((node.name === '.secret_1' || node.name === '.secret_2') && onSecretFound) {
+          if ((node.name === atob('LnNlY3JldF8x') || node.name === atob('LnNlY3JldF8y')) && onSecretFound) {
             onSecretFound();
           }
         }
