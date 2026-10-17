@@ -44,7 +44,6 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({
         <SidebarTree
           root={root}
           terminalCwd={terminalCwd}
-          explorerCwd={explorerCwd}
           onNavigate={onNavigateExplorer}
         />
 

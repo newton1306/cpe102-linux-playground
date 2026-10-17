@@ -6,21 +6,18 @@ import {
   ChevronDown,
   HardDrive,
   Pin,
-  Eye,
 } from 'lucide-react';
 import type { VNode } from '../../types/vfs';
 
 interface SidebarTreeProps {
   root: VNode;
   terminalCwd: string;
-  explorerCwd: string;
   onNavigate: (path: string) => void;
 }
 
 export const SidebarTree: React.FC<SidebarTreeProps> = ({
   root,
   terminalCwd,
-  explorerCwd,
   onNavigate,
 }) => {
   const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({
@@ -40,7 +37,6 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({
   // Recursive tree renderer for directory nodes
   const renderDirNode = (node: VNode, currentPath: string, depth = 0) => {
     const isTerminalCwd = terminalCwd === currentPath;
-    const isExplorerViewing = explorerCwd === currentPath;
     const isExpanded = expandedPaths[currentPath] ?? true;
 
     // Get subdirectories
@@ -54,8 +50,6 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({
           className={`group flex items-center gap-1.5 py-1.5 px-2 rounded cursor-pointer transition-all ${
             isTerminalCwd
               ? 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/50 shadow-xs glow-green-sm font-semibold'
-              : isExplorerViewing
-              ? 'bg-cyan-950/40 text-cyan-300 border border-cyan-500/30 font-medium'
               : 'text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
           }`}
           style={{ paddingLeft: `${Math.max(6, depth * 14)}px` }}
@@ -80,13 +74,13 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({
           {isExpanded ? (
             <FolderOpen
               className={`w-3.5 h-3.5 shrink-0 ${
-                isTerminalCwd ? 'text-emerald-400' : isExplorerViewing ? 'text-cyan-400' : 'text-slate-400'
+                isTerminalCwd ? 'text-emerald-400' : 'text-slate-400'
               }`}
             />
           ) : (
             <Folder
               className={`w-3.5 h-3.5 shrink-0 ${
-                isTerminalCwd ? 'text-emerald-400' : isExplorerViewing ? 'text-cyan-400' : 'text-slate-400'
+                isTerminalCwd ? 'text-emerald-400' : 'text-slate-400'
               }`}
             />
           )}
@@ -96,19 +90,11 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({
             {node.name || '/ (root)'}
           </span>
 
-          {/* Terminal CWD Badge */}
+          {/* Terminal CWD Badge Only */}
           {isTerminalCwd && (
             <span className="ml-auto flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-500/40 font-mono tracking-wider animate-pulse shrink-0">
               <Pin className="w-2.5 h-2.5" />
               <span>CWD</span>
-            </span>
-          )}
-
-          {/* Explorer Viewing Badge (if looking somewhere else) */}
-          {!isTerminalCwd && isExplorerViewing && (
-            <span className="ml-auto flex items-center gap-1 text-[10px] bg-cyan-500/10 text-cyan-300 px-1.5 py-0.2 rounded border border-cyan-500/30 font-mono shrink-0">
-              <Eye className="w-2.5 h-2.5 text-cyan-400" />
-              <span>view</span>
             </span>
           )}
         </div>

@@ -61,11 +61,9 @@ export const Terminal: React.FC<TerminalProps> = ({
 
   // Keep input focused when clicking inside terminal without disrupting scroll position
   const handleContainerClick = (e: React.MouseEvent) => {
-    // If user is selecting text, don't steal selection
     const selection = window.getSelection();
     if (selection && selection.toString().length > 0) return;
 
-    // Prevent scrolling when focusing
     e.stopPropagation();
     inputRef.current?.focus({ preventScroll: true });
   };
@@ -162,6 +160,77 @@ export const Terminal: React.FC<TerminalProps> = ({
 
   const currentPromptPath = formatPromptPath(state.cwd);
 
+  // Dedicated renderer for stdout: detect QR codes and render them in high-contrast scannable cards
+  const renderStdout = (stdout: string) => {
+    if (!stdout.includes('█▀▀▀▀▀█')) {
+      return (
+        <pre className="text-slate-300 whitespace-pre-wrap leading-relaxed pl-2 font-mono text-[11.5px]">
+          {stdout}
+        </pre>
+      );
+    }
+
+    // Separate text message and QR block
+    const lines = stdout.split('\n');
+    const preQrLines: string[] = [];
+    const qrLines: string[] = [];
+    const postQrLines: string[] = [];
+    let qrStarted = false;
+    let qrEnded = false;
+
+    for (const line of lines) {
+      if (line.includes('█▀▀▀▀▀█')) {
+        qrStarted = true;
+      }
+
+      if (qrStarted && !qrEnded) {
+        if (line.includes('█') || line.includes('▀') || line.includes('▄') || line.trim() === '') {
+          qrLines.push(line);
+        } else {
+          qrEnded = true;
+          postQrLines.push(line);
+        }
+      } else if (!qrStarted) {
+        preQrLines.push(line);
+      } else {
+        postQrLines.push(line);
+      }
+    }
+
+    return (
+      <div className="pl-2 space-y-1">
+        {preQrLines.length > 0 && (
+          <pre className="text-slate-300 whitespace-pre-wrap leading-relaxed font-mono text-[11.5px]">
+            {preQrLines.join('\n')}
+          </pre>
+        )}
+
+        {/* High-contrast crisp white QR card with seamless line-height: 1.0 */}
+        {qrLines.length > 0 && (
+          <div className="inline-block bg-white text-black p-3.5 rounded-lg shadow-2xl border border-slate-300 my-1">
+            <pre
+              className="font-mono text-black font-bold select-all tracking-normal"
+              style={{
+                lineHeight: '1.02',
+                letterSpacing: '0px',
+                fontSize: '13px',
+                margin: 0,
+              }}
+            >
+              {qrLines.join('\n')}
+            </pre>
+          </div>
+        )}
+
+        {postQrLines.length > 0 && (
+          <pre className="text-slate-300 whitespace-pre-wrap leading-relaxed font-mono text-[11.5px]">
+            {postQrLines.join('\n')}
+          </pre>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div
       onClick={handleContainerClick}
@@ -216,11 +285,7 @@ export const Terminal: React.FC<TerminalProps> = ({
             </div>
 
             {/* Command Output */}
-            {entry.stdout && (
-              <pre className="text-slate-300 whitespace-pre-wrap leading-relaxed pl-2 font-mono text-[11.5px]">
-                {entry.stdout}
-              </pre>
-            )}
+            {entry.stdout && renderStdout(entry.stdout)}
 
             {/* Command Error */}
             {entry.stderr && (
