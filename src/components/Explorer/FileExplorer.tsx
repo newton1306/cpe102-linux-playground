@@ -8,30 +8,32 @@ import { StatusBar } from './StatusBar';
 
 interface FileExplorerProps {
   root: VNode;
-  cwd: string;
+  terminalCwd: string;
+  explorerCwd: string;
   lastAction: VFSActionEffect;
-  onNavigate: (path: string) => void;
+  onNavigateExplorer: (path: string) => void;
   selectedNode: VNode | null;
   onSelectNode: (node: VNode | null) => void;
 }
 
 export const FileExplorer: React.FC<FileExplorerProps> = ({
   root,
-  cwd,
+  terminalCwd,
+  explorerCwd,
   lastAction,
-  onNavigate,
+  onNavigateExplorer,
   selectedNode,
   onSelectNode,
 }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'details'>('grid');
-  const currentDir = getNodeByPath(root, cwd);
+  const currentDir = getNodeByPath(root, explorerCwd) || getNodeByPath(root, terminalCwd);
 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-900/60 overflow-hidden border-r border-slate-800">
-      {/* Top Address & Navigation Bar */}
+      {/* Top Address & Navigation Bar (Views explorerCwd) */}
       <AddressBar
-        cwd={cwd}
-        onNavigate={onNavigate}
+        cwd={explorerCwd}
+        onNavigate={onNavigateExplorer}
         viewMode={viewMode}
         onToggleViewMode={setViewMode}
       />
@@ -39,13 +41,18 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({
       {/* Center: Sidebar + Main File Grid */}
       <div className="flex-1 flex overflow-hidden">
         {/* Navigation Sidebar */}
-        <SidebarTree root={root} cwd={cwd} onNavigate={onNavigate} />
+        <SidebarTree
+          root={root}
+          terminalCwd={terminalCwd}
+          explorerCwd={explorerCwd}
+          onNavigate={onNavigateExplorer}
+        />
 
         {/* Main Folder Items Canvas */}
         <FileGrid
           currentDir={currentDir}
-          cwd={cwd}
-          onNavigate={onNavigate}
+          cwd={explorerCwd}
+          onNavigate={onNavigateExplorer}
           onSelectFile={onSelectNode}
           selectedNode={selectedNode}
           lastAction={lastAction}
@@ -54,7 +61,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({
       </div>
 
       {/* Bottom Status Bar */}
-      <StatusBar currentDir={currentDir} selectedNode={selectedNode} cwd={cwd} />
+      <StatusBar currentDir={currentDir} selectedNode={selectedNode} cwd={terminalCwd} />
     </div>
   );
 };

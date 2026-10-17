@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import {
   Folder,
   FolderOpen,
-  Home,
   ChevronRight,
   ChevronDown,
   HardDrive,
   Pin,
-  Terminal,
-  Gamepad2,
-  Globe,
+  Eye,
 } from 'lucide-react';
 import type { VNode } from '../../types/vfs';
 
 interface SidebarTreeProps {
   root: VNode;
-  cwd: string;
+  terminalCwd: string;
+  explorerCwd: string;
   onNavigate: (path: string) => void;
 }
 
-export const SidebarTree: React.FC<SidebarTreeProps> = ({ root, cwd, onNavigate }) => {
+export const SidebarTree: React.FC<SidebarTreeProps> = ({
+  root,
+  terminalCwd,
+  explorerCwd,
+  onNavigate,
+}) => {
   const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({
     '/': true,
     '/home': true,
@@ -34,19 +37,11 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({ root, cwd, onNavigate 
     }));
   };
 
-  // Quick Access items
-  const quickAccessItems = [
-    { name: 'Home (~)', path: '/home/student', icon: Home },
-    { name: 'cpe102', path: '/home/student/cpe102', icon: Terminal },
-    { name: 'playground', path: '/home/student/playground', icon: Gamepad2 },
-    { name: 'projects', path: '/home/student/projects', icon: Globe },
-    { name: 'Root (/)', path: '/', icon: HardDrive },
-  ];
-
   // Recursive tree renderer for directory nodes
   const renderDirNode = (node: VNode, currentPath: string, depth = 0) => {
-    const isCwd = cwd === currentPath;
-    const isExpanded = expandedPaths[currentPath] ?? (depth <= 2);
+    const isTerminalCwd = terminalCwd === currentPath;
+    const isExplorerViewing = explorerCwd === currentPath;
+    const isExpanded = expandedPaths[currentPath] ?? true;
 
     // Get subdirectories
     const subDirs = Object.values(node.children || {}).filter((child) => child.type === 'dir');
@@ -56,9 +51,11 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({ root, cwd, onNavigate 
       <div key={currentPath} className="flex flex-col">
         <div
           onClick={() => onNavigate(currentPath)}
-          className={`group flex items-center gap-1.5 py-1 px-2 rounded cursor-pointer transition-all ${
-            isCwd
-              ? 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/50 shadow-xs shadow-emerald-950 glow-green-sm font-semibold'
+          className={`group flex items-center gap-1.5 py-1.5 px-2 rounded cursor-pointer transition-all ${
+            isTerminalCwd
+              ? 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/50 shadow-xs glow-green-sm font-semibold'
+              : isExplorerViewing
+              ? 'bg-cyan-950/40 text-cyan-300 border border-cyan-500/30 font-medium'
               : 'text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
           }`}
           style={{ paddingLeft: `${Math.max(6, depth * 14)}px` }}
@@ -83,27 +80,35 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({ root, cwd, onNavigate 
           {isExpanded ? (
             <FolderOpen
               className={`w-3.5 h-3.5 shrink-0 ${
-                isCwd ? 'text-emerald-400' : 'text-cyan-400'
+                isTerminalCwd ? 'text-emerald-400' : isExplorerViewing ? 'text-cyan-400' : 'text-slate-400'
               }`}
             />
           ) : (
             <Folder
               className={`w-3.5 h-3.5 shrink-0 ${
-                isCwd ? 'text-emerald-400' : 'text-cyan-400/80'
+                isTerminalCwd ? 'text-emerald-400' : isExplorerViewing ? 'text-cyan-400' : 'text-slate-400'
               }`}
             />
           )}
 
           {/* Folder Name */}
           <span className="truncate text-xs">
-            {node.name || '/'}
+            {node.name || '/ (root)'}
           </span>
 
-          {/* CWD Pin Highlight */}
-          {isCwd && (
+          {/* Terminal CWD Badge */}
+          {isTerminalCwd && (
             <span className="ml-auto flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-500/40 font-mono tracking-wider animate-pulse shrink-0">
               <Pin className="w-2.5 h-2.5" />
               <span>CWD</span>
+            </span>
+          )}
+
+          {/* Explorer Viewing Badge (if looking somewhere else) */}
+          {!isTerminalCwd && isExplorerViewing && (
+            <span className="ml-auto flex items-center gap-1 text-[10px] bg-cyan-500/10 text-cyan-300 px-1.5 py-0.2 rounded border border-cyan-500/30 font-mono shrink-0">
+              <Eye className="w-2.5 h-2.5 text-cyan-400" />
+              <span>view</span>
             </span>
           )}
         </div>
@@ -122,49 +127,14 @@ export const SidebarTree: React.FC<SidebarTreeProps> = ({ root, cwd, onNavigate 
   };
 
   return (
-    <aside className="w-48 sm:w-56 shrink-0 border-r border-slate-800 bg-slate-950/90 flex flex-col font-mono text-xs overflow-y-auto select-none p-2 space-y-4">
-      {/* Quick Access Section */}
+    <aside className="w-48 sm:w-56 shrink-0 border-r border-slate-800 bg-slate-950/90 flex flex-col font-mono text-xs overflow-y-auto select-none p-2 space-y-3">
+      {/* File System Tree */}
       <div>
-        <div className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase px-2 mb-1 flex items-center gap-1">
-          <Pin className="w-2.5 h-2.5" />
-          <span>Quick Access</span>
-        </div>
-        <div className="space-y-0.5">
-          {quickAccessItems.map((item) => {
-            const isCwd = cwd === item.path;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.path}
-                onClick={() => onNavigate(item.path)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded transition-all cursor-pointer text-left ${
-                  isCwd
-                    ? 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 glow-green-sm font-semibold'
-                    : 'text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'
-                }`}
-              >
-                <Icon
-                  className={`w-3.5 h-3.5 shrink-0 ${
-                    isCwd ? 'text-emerald-400' : 'text-slate-400'
-                  }`}
-                />
-                <span className="truncate">{item.name}</span>
-                {isCwd && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Directory Tree Section */}
-      <div>
-        <div className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase px-2 mb-1 flex items-center gap-1">
-          <HardDrive className="w-2.5 h-2.5" />
+        <div className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase px-2 mb-2 flex items-center gap-1.5">
+          <HardDrive className="w-3 h-3 text-cyan-400" />
           <span>File System Tree</span>
         </div>
-        <div className="space-y-0.5">{renderDirNode(root, '/', 0)}</div>
+        <div className="space-y-1">{renderDirNode(root, '/', 0)}</div>
       </div>
     </aside>
   );

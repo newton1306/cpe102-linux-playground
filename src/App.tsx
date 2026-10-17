@@ -8,7 +8,6 @@ import { ResetConfirmModal } from './components/Modals/ResetConfirmModal';
 import type { TerminalEntry, VNode } from './types/vfs';
 import {
   loadVFSState,
-  persistVFSState,
   resetVFSState,
   STORAGE_KEY_HISTORY,
 } from './vfs/vfsEngine';
@@ -16,6 +15,7 @@ import { executeCommand } from './vfs/commandExecutor';
 
 export function App() {
   const [vfsState, setVfsState] = useState(() => loadVFSState());
+  const [explorerCwd, setExplorerCwd] = useState<string>(() => vfsState.cwd);
   const [terminalEntries, setTerminalEntries] = useState<TerminalEntry[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_HISTORY);
@@ -42,8 +42,8 @@ export function App() {
   // Trigger celebration confetti when secret Easter egg is found
   const handleSecretFound = useCallback(() => {
     confetti({
-      particleCount: 100,
-      spread: 70,
+      particleCount: 120,
+      spread: 80,
       origin: { y: 0.6 },
       colors: ['#00ff66', '#00f0ff', '#f59e0b', '#ec4899'],
     });
@@ -80,32 +80,25 @@ export function App() {
 
       setTerminalEntries((prev) => [...prev, newEntry]);
       setVfsState(nextState);
+
+      // If cd was executed in terminal, also sync Explorer view to the new directory!
+      if (nextState.cwd !== vfsState.cwd) {
+        setExplorerCwd(nextState.cwd);
+      }
     },
     [vfsState, handleSecretFound]
   );
 
-  // Navigate folder directly from Explorer
-  const handleNavigateFromExplorer = useCallback(
-    (targetPath: string) => {
-      const nextState = {
-        ...vfsState,
-        cwd: targetPath,
-        lastAction: {
-          type: 'cd' as const,
-          targetPath,
-          timestamp: Date.now(),
-        },
-      };
-      setVfsState(nextState);
-      persistVFSState(nextState);
-    },
-    [vfsState]
-  );
+  // Browse folder directly from Explorer: only updates explorer view without changing terminal CWD
+  const handleNavigateFromExplorer = useCallback((targetPath: string) => {
+    setExplorerCwd(targetPath);
+  }, []);
 
   // Reset entire session
   const handleConfirmReset = useCallback(() => {
     const newState = resetVFSState();
     setVfsState(newState);
+    setExplorerCwd(newState.cwd);
     setTerminalEntries([]);
     setSelectedNode(null);
     localStorage.removeItem(STORAGE_KEY_HISTORY);
@@ -121,9 +114,10 @@ export function App() {
         leftPane={
           <FileExplorer
             root={vfsState.root}
-            cwd={vfsState.cwd}
+            terminalCwd={vfsState.cwd}
+            explorerCwd={explorerCwd}
             lastAction={vfsState.lastAction}
-            onNavigate={handleNavigateFromExplorer}
+            onNavigateExplorer={handleNavigateFromExplorer}
             selectedNode={selectedNode}
             onSelectNode={setSelectedNode}
           />

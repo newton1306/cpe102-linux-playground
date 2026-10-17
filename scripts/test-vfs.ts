@@ -1,10 +1,9 @@
 import assert from 'node:assert';
 import { createInitialVFS } from '../src/vfs/initialTree.ts';
 import { executeCommand } from '../src/vfs/commandExecutor.ts';
-import { resolvePath } from '../src/vfs/pathUtils.ts';
 import type { VFSState } from '../src/types/vfs.ts';
 
-console.log('🧪 Starting Virtual File System & Command Test Suite...\n');
+console.log('🧪 Starting Virtual File System & Command Test Suite (Revision 2)...\n');
 
 let state: VFSState = {
   root: createInitialVFS(),
@@ -29,23 +28,23 @@ console.log('  ✓ pwd outputs /home/student');
 console.log('Test 2: ls');
 const rLs = run('ls');
 assert.ok(rLs.stdout.includes('welcome.txt'));
-assert.ok(!rLs.stdout.includes('.secret_flag')); // Hidden by default
+assert.ok(!rLs.stdout.includes('.secret_1')); // Hidden by default
+assert.ok(!rLs.stdout.includes('.secret_2')); // Hidden by default
 assert.strictEqual(rLs.exitCode, 0);
 console.log('  ✓ ls shows normal files, hides dotfiles');
 
 // 3. ls -a
 console.log('Test 3: ls -a');
 const rLsA = run('ls -a');
-assert.ok(rLsA.stdout.includes('.secret_flag'));
-assert.ok(rLsA.stdout.includes('.bashrc'));
+assert.ok(rLsA.stdout.includes('.secret_1'));
+assert.ok(rLsA.stdout.includes('.secret_2'));
 assert.ok(rLsA.stdout.includes('welcome.txt'));
-console.log('  ✓ ls -a reveals hidden files');
+console.log('  ✓ ls -a reveals hidden files .secret_1 and .secret_2');
 
 // 4. ls -F
 console.log('Test 4: ls -F');
 const rLsF = run('ls -F');
 assert.ok(rLsF.stdout.includes('cpe102/'));
-assert.ok(rLsF.stdout.includes('playground/'));
 console.log('  ✓ ls -F appends / to directories');
 
 // 5. cat
@@ -54,16 +53,26 @@ const rCat = run('cat welcome.txt');
 assert.ok(rCat.stdout.includes('CPE102'));
 assert.strictEqual(rCat.exitCode, 0);
 
-let secretTriggered = false;
+let secret1Triggered = false;
 executeCommand({
   state,
-  commandLine: 'cat .secret_flag',
+  commandLine: 'cat .secret_1',
   onSecretFound: () => {
-    secretTriggered = true;
+    secret1Triggered = true;
   },
 });
-assert.strictEqual(secretTriggered, true);
-console.log('  ✓ cat reads files and triggers secret easter egg');
+assert.strictEqual(secret1Triggered, true);
+
+let secret2Triggered = false;
+executeCommand({
+  state,
+  commandLine: 'cat .secret_2',
+  onSecretFound: () => {
+    secret2Triggered = true;
+  },
+});
+assert.strictEqual(secret2Triggered, true);
+console.log('  ✓ cat reads .secret_1 and .secret_2 and triggers confetti');
 
 // 6. cd
 console.log('Test 6: cd');

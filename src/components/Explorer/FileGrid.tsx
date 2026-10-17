@@ -3,10 +3,8 @@ import {
   Folder,
   FileText,
   FileCode,
-  Key,
   Eye,
   File,
-  Sparkles,
 } from 'lucide-react';
 import type { VFSActionEffect, VNode } from '../../types/vfs';
 
@@ -29,7 +27,6 @@ export const FileGrid: React.FC<FileGridProps> = ({
   lastAction,
   viewMode,
 }) => {
-
   if (!currentDir || currentDir.type !== 'dir') {
     return (
       <div className="flex-1 flex items-center justify-center font-mono text-sm text-slate-500">
@@ -50,17 +47,14 @@ export const FileGrid: React.FC<FileGridProps> = ({
     if (item.type === 'dir') {
       return <Folder className="w-8 h-8 text-cyan-400 fill-cyan-950/40" />;
     }
-    if (item.name === '.secret_flag') {
-      return <Key className="w-8 h-8 text-amber-400 animate-bounce" />;
+    if (item.name.startsWith('.')) {
+      return <Eye className="w-8 h-8 text-emerald-400/80 animate-pulse" />;
     }
     if (item.name.endsWith('.py')) {
       return <FileCode className="w-8 h-8 text-emerald-400" />;
     }
     if (item.name.endsWith('.html') || item.name.endsWith('.css')) {
       return <FileCode className="w-8 h-8 text-blue-400" />;
-    }
-    if (item.name.startsWith('.')) {
-      return <Eye className="w-8 h-8 text-slate-400" />;
     }
     return <FileText className="w-8 h-8 text-slate-300" />;
   };
@@ -69,8 +63,8 @@ export const FileGrid: React.FC<FileGridProps> = ({
     if (item.type === 'dir') {
       return <Folder className="w-4 h-4 text-cyan-400 shrink-0" />;
     }
-    if (item.name === '.secret_flag') {
-      return <Key className="w-4 h-4 text-amber-400 shrink-0" />;
+    if (item.name.startsWith('.')) {
+      return <Eye className="w-4 h-4 text-emerald-400 shrink-0" />;
     }
     if (item.name.endsWith('.py')) {
       return <FileCode className="w-4 h-4 text-emerald-400 shrink-0" />;
@@ -152,23 +146,15 @@ export const FileGrid: React.FC<FileGridProps> = ({
                   isSelected
                     ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 shadow-md glow-green-sm'
                     : isHidden
-                    ? 'border-dashed border-slate-700 bg-slate-900/30 text-slate-400 opacity-60 hover:opacity-100 hover:border-slate-500'
+                    ? 'border-dashed border-emerald-900/60 bg-emerald-950/10 text-emerald-400/70 hover:opacity-100 hover:border-emerald-500/50'
                     : 'border-slate-800 bg-slate-900/60 text-slate-200 hover:border-slate-700 hover:bg-slate-800/60'
                 } ${animClass}`}
               >
-                {/* Hidden File Badge */}
+                {/* Hidden File Status Badge */}
                 {isHidden && (
-                  <span className="absolute top-1.5 right-1.5 flex items-center gap-0.5 text-[9px] bg-slate-800/80 text-slate-400 px-1 rounded border border-slate-700/60">
+                  <span className="absolute top-1.5 right-1.5 flex items-center gap-0.5 text-[9px] bg-emerald-950/80 text-emerald-400 px-1.5 py-0.2 rounded border border-emerald-500/40">
                     <Eye className="w-2.5 h-2.5" />
-                    <span>hidden</span>
-                  </span>
-                )}
-
-                {/* Secret Easter Egg Indicator */}
-                {item.name === '.secret_flag' && (
-                  <span className="absolute top-1.5 left-1.5 flex items-center gap-0.5 text-[9px] bg-amber-950/80 text-amber-300 px-1 rounded border border-amber-500/40 glow-amber">
-                    <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                    <span>secret</span>
+                    <span>hidden item</span>
                   </span>
                 )}
 
@@ -177,14 +163,18 @@ export const FileGrid: React.FC<FileGridProps> = ({
                   {getItemIcon(item)}
                 </div>
 
-                {/* Name */}
+                {/* Name: MUST NOT display filename if hidden */}
                 <span className="w-full truncate text-xs font-medium px-1">
-                  {item.name}
+                  {isHidden ? (
+                    <span className="text-emerald-400/90 italic tracking-wider">[ Hidden Item ]</span>
+                  ) : (
+                    item.name
+                  )}
                 </span>
 
                 {/* Subtitle / Type */}
                 <span className="text-[10px] text-slate-500 mt-1 truncate">
-                  {item.type === 'dir' ? 'Folder' : formatSize(item.size)}
+                  {isHidden ? 'Hidden File' : item.type === 'dir' ? 'Folder' : formatSize(item.size)}
                 </span>
               </div>
             );
@@ -221,29 +211,28 @@ export const FileGrid: React.FC<FileGridProps> = ({
                   isSelected
                     ? 'bg-emerald-950/50 text-emerald-300 font-semibold'
                     : isHidden
-                    ? 'opacity-60 hover:opacity-100 hover:bg-slate-900/80 text-slate-400'
+                    ? 'bg-emerald-950/10 text-emerald-400/80 hover:bg-emerald-950/20'
                     : 'text-slate-300 hover:bg-slate-900/80'
                 } ${animClass}`}
               >
                 <td className="py-2 px-3 flex items-center gap-2">
                   {getSmallItemIcon(item)}
-                  <span className="truncate">{item.name}</span>
-                  {isHidden && (
-                    <span className="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.2 rounded border border-slate-700">
-                      hidden
-                    </span>
+                  {isHidden ? (
+                    <span className="text-emerald-400/90 italic tracking-wider">[ Hidden Item ]</span>
+                  ) : (
+                    <span className="truncate">{item.name}</span>
                   )}
-                  {item.name === '.secret_flag' && (
-                    <span className="text-[9px] bg-amber-950 text-amber-300 px-1 py-0.2 rounded border border-amber-500/50">
-                      ★ secret
+                  {isHidden && (
+                    <span className="text-[9px] bg-emerald-950 text-emerald-400 px-1 py-0.2 rounded border border-emerald-500/40">
+                      hidden
                     </span>
                   )}
                 </td>
                 <td className="py-2 px-3 text-slate-500 hidden sm:table-cell">
-                  {item.type === 'dir' ? 'File Folder' : 'Document'}
+                  {isHidden ? 'Hidden File' : item.type === 'dir' ? 'File Folder' : 'Document'}
                 </td>
                 <td className="py-2 px-3 text-slate-500">
-                  {item.type === 'dir' ? '—' : formatSize(item.size)}
+                  {isHidden ? '—' : item.type === 'dir' ? '—' : formatSize(item.size)}
                 </td>
                 <td className="py-2 px-3 text-slate-600 hidden md:table-cell font-mono">
                   {item.permissions}

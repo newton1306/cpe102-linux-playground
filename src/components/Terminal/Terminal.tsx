@@ -22,17 +22,52 @@ export const Terminal: React.FC<TerminalProps> = ({
   const [inputVal, setInputVal] = useState('');
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const terminalEndRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const prevEntriesCountRef = useRef(entries.length);
 
-  // Auto-scroll to bottom whenever entries update
+  // Auto-focus on mount
   useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [entries]);
+    inputRef.current?.focus({ preventScroll: true });
+  }, []);
 
-  // Keep input focused when clicking anywhere inside the terminal
-  const handleContainerClick = () => {
-    inputRef.current?.focus();
+  // Global keydown listener so user can start typing anytime without manual focus
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if inside an input or if modifier keys (Ctrl, Alt, Meta) pressed
+      if (
+        document.activeElement === inputRef.current ||
+        (document.activeElement && document.activeElement.tagName === 'INPUT')
+      ) {
+        return;
+      }
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Tab') {
+        inputRef.current?.focus({ preventScroll: true });
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  // Only auto-scroll to bottom when NEW commands are entered, allowing free manual scrolling anytime
+  useEffect(() => {
+    if (entries.length > prevEntriesCountRef.current) {
+      terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    prevEntriesCountRef.current = entries.length;
+  }, [entries.length]);
+
+  // Keep input focused when clicking inside terminal without disrupting scroll position
+  const handleContainerClick = (e: React.MouseEvent) => {
+    // If user is selecting text, don't steal selection
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) return;
+
+    // Prevent scrolling when focusing
+    e.stopPropagation();
+    inputRef.current?.focus({ preventScroll: true });
   };
 
   // Keyboard navigation & Shortcuts (Up/Down history, Tab completion, Ctrl+L)
@@ -125,20 +160,19 @@ export const Terminal: React.FC<TerminalProps> = ({
     }
   };
 
-  const promptPath = formatPromptPath(state.cwd);
+  const currentPromptPath = formatPromptPath(state.cwd);
 
   return (
     <div
-      ref={containerRef}
       onClick={handleContainerClick}
       className="flex-1 flex flex-col h-full bg-[#05080f] font-mono text-xs overflow-hidden select-text relative scanlines"
     >
       {/* Terminal Title Bar */}
-      <div className="h-8 border-b border-slate-800 bg-slate-950 px-3 flex items-center justify-between select-none">
+      <div className="h-8 border-b border-slate-800 bg-slate-950 px-3 flex items-center justify-between select-none shrink-0">
         <div className="flex items-center gap-2">
           <TerminalIcon className="w-3.5 h-3.5 text-emerald-400" />
           <span className="text-[11px] font-semibold text-slate-300">
-            student@cpe102: {promptPath} (bash)
+            student@cpe102: {currentPromptPath} (bash)
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -148,8 +182,11 @@ export const Terminal: React.FC<TerminalProps> = ({
         </div>
       </div>
 
-      {/* Terminal Console Output Scroll Area */}
-      <div className="flex-1 p-3 overflow-y-auto space-y-3">
+      {/* Terminal Console Output Scroll Area (smooth free scrolling) */}
+      <div
+        ref={scrollAreaRef}
+        className="flex-1 p-3 overflow-y-auto space-y-3 overscroll-contain"
+      >
         {/* Welcome Banner */}
         <div className="text-slate-400 pb-2 border-b border-slate-800/80 space-y-1">
           <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm text-glow-green">
@@ -194,24 +231,26 @@ export const Terminal: React.FC<TerminalProps> = ({
           </div>
         ))}
 
-        {/* Active Command Line Input */}
+        {/* Active Command Line Input with Continuous Blinking Cursor */}
         <div className="flex items-center gap-1 flex-wrap pt-1">
           <span className="text-emerald-400 font-bold">student@cpe102</span>
           <span className="text-slate-500">:</span>
-          <span className="text-blue-400 font-bold">{promptPath}</span>
+          <span className="text-blue-400 font-bold">{currentPromptPath}</span>
           <span className="text-slate-400 font-bold">$</span>
-          <div className="flex-1 min-w-[200px] flex items-center">
+          <div className="flex-1 min-w-[200px] flex items-center relative">
             <input
               ref={inputRef}
               type="text"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent border-none outline-none text-slate-100 font-mono text-xs px-1 caret-emerald-400"
+              className="w-full bg-transparent border-none outline-none text-emerald-300 font-mono text-xs px-1 caret-emerald-400"
               autoFocus
               spellCheck={false}
               autoComplete="off"
             />
+            {/* Visible pulsing neon cursor block indicator */}
+            <span className="inline-block w-2 h-3.5 bg-emerald-400 animate-pulse ml-0.5 glow-green-sm" />
           </div>
         </div>
 

@@ -22,7 +22,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({ currentDir, selectedNode, 
         </span>
         {selectedNode && (
           <span className="text-emerald-400 font-medium">
-            | Selected: {selectedNode.name}
+            | Selected: {selectedNode.name.startsWith('.') ? '[ Hidden Item ]' : selectedNode.name}
             {selectedNode.type === 'file' ? ` (${selectedNode.size} B)` : ' [DIR]'}
           </span>
         )}
