@@ -2,9 +2,9 @@ import type { VNode, VFSState } from '../types/vfs';
 import { createInitialVFS } from './initialTree';
 import { getPathSegments, splitParentAndName, HOME_DIR } from './pathUtils';
 
-export const STORAGE_KEY_VFS = 'cpe102_vfs_state_v1';
-export const STORAGE_KEY_CWD = 'cpe102_vfs_cwd_v1';
-export const STORAGE_KEY_HISTORY = 'cpe102_vfs_history_v1';
+export const STORAGE_KEY_VFS = 'cpe102_vfs_state_v2';
+export const STORAGE_KEY_CWD = 'cpe102_vfs_cwd_v2';
+export const STORAGE_KEY_HISTORY = 'cpe102_vfs_history_v2';
 
 /**
  * Deep clone a VNode tree

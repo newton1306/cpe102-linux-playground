@@ -246,8 +246,9 @@ export const Terminal: React.FC<TerminalProps> = ({
   const currentPromptPath = formatPromptPath(state.cwd);
 
   // Dedicated renderer for stdout: detect QR codes and render them in high-contrast scannable cards
+  const QR_FINDER = '\u2588\u2580\u2580\u2580\u2580\u2580\u2588';
   const renderStdout = (stdout: string) => {
-    if (!stdout.includes('█▀▀▀▀▀█')) {
+    if (!stdout.includes(QR_FINDER)) {
       return (
         <pre className="text-slate-300 whitespace-pre-wrap leading-relaxed pl-2 font-mono text-[11.5px]">
           {stdout}
@@ -264,12 +265,17 @@ export const Terminal: React.FC<TerminalProps> = ({
     let qrEnded = false;
 
     for (const line of lines) {
-      if (line.includes('█▀▀▀▀▀█')) {
+      if (line.includes(QR_FINDER)) {
         qrStarted = true;
       }
 
       if (qrStarted && !qrEnded) {
-        if (line.includes('█') || line.includes('▀') || line.includes('▄') || line.trim() === '') {
+        if (
+          line.includes('\u2588') ||
+          line.includes('\u2580') ||
+          line.includes('\u2584') ||
+          line.trim() === ''
+        ) {
           qrLines.push(line);
         } else {
           qrEnded = true;

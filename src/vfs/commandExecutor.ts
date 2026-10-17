@@ -12,6 +12,7 @@ import {
   formatPromptPath,
   resolvePath,
 } from './pathUtils';
+import { unlockVaultContent, isSecretAsset } from '../security/cryptoVault';
 
 export interface ExecuteOptions {
   state: VFSState;
@@ -168,8 +169,12 @@ export function executeCommand({ state, commandLine, onSecretFound }: ExecuteOpt
         } else if (node.type === 'dir') {
           errors.push(`cat: ${fileArg}: Is a directory`);
         } else {
-          outputs.push(node.content);
-          if ((node.name === atob('LnNlY3JldF8x') || node.name === atob('LnNlY3JldF8y')) && onSecretFound) {
+          let text = node.content;
+          if (node.isEncrypted && node.cipherPayload) {
+            text = unlockVaultContent(node.cipherPayload, node.name, node.vaultKeyHash);
+          }
+          outputs.push(text);
+          if (isSecretAsset(node.name) && onSecretFound) {
             onSecretFound();
           }
         }

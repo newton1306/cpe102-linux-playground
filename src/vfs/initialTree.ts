@@ -1,38 +1,5 @@
 import type { VNode } from '../types/vfs';
-
-const RICK_ROLL_QR = `                                 
-  █▀▀▀▀▀█ ██  ██▀▀▄█ ▀  █▀▀▀▀▀█  
-  █ ███ █ ▄ █▄▀ ▄▄▀ ▀ █ █ ███ █  
-  █ ▀▀▀ █  ▀█▀ ▄▀▄████  █ ▀▀▀ █  
-  ▀▀▀▀▀▀▀ █ ▀ ▀ ▀▄█▄█ ▀ ▀▀▀▀▀▀▀  
-  █▄▀▀ ▀▀█ ▄▄▀██▄█ ▀██▀ █▄▄▀ ▀█  
-  ▀█▄██▀▀▀▀▄▄▀▀▀  █ █ ▄█▄█  ▀▀▄  
-  ▄ ▀▄█▄▀█▄▀█ ▀ █▀▄ ▄▄▀▀▄▀ ▀█▄▄  
-  ▄▄▀ ██▀▀ █▀ █▀▄▀█ ▄▀▀█▄█▄ ▀█▀  
-  ▀▄▄  ▀▀▄█▀██▄ █▀█ ▀▄▄▀ ▄▀█▄█   
-  ▀ █▄  ▀▄▀█▄ ███▀▀██  ▀▄▀▄ █    
-   ▀▀▀▀▀▀ ▄▀█▀█▀▀▄█ ▀▀█▀▀▀███▄▄  
-  █▀▀▀▀▀█ █ ▄ █▄██ ▀▄▀█ ▀ ██ ▀▄  
-  █ ███ █ ▄█ ██   ▀ ▀▄▀█▀██▄▀▄▀  
-  █ ▀▀▀ █ ▀ ▄ ▄▄▀▄ ██ █  █▄▄▀▄▀  
-  ▀▀▀▀▀▀▀ ▀ ▀ ▀    ▀▀ ▀▀ ▀▀▀ ▀   
-                                 `;
-
-const GOOGLE_QR = `                             
-  █▀▀▀▀▀█    ▄█ ▄▄▀ █▀▀▀▀▀█  
-  █ ███ █ █▀█▄▀▄▀▀▀ █ ███ █  
-  █ ▀▀▀ █ ██▄███▄▄█ █ ▀▀▀ █  
-  ▀▀▀▀▀▀▀ █▄█▄▀ ▀ █ ▀▀▀▀▀▀▀  
-  █▄██▀▀▀   ▀█ ▀▀▀▄▄▀█▀▀▀▄   
-  ▀▄▀▄▄ ▀▄ ▄▀  ▀▄▀██▀█▀▀ ▀█  
-  ▄▀██  ▀▄ ▀▀ ▄█▀ ▄█▀█▀▄▀█▀  
-  █ ▀█ █▀▄ █  ▄▀█▀██▀██▀ ▀█  
-  ▀    ▀▀▀▄▀▀ ▀█▀▄█▀▀▀█▄▀    
-  █▀▀▀▀▀█ ▄█▄█▀ █ █ ▀ █▄▀▀▀  
-  █ ███ █ █ ▄▀▄▄ ▀█▀█▀█▄███  
-  █ ▀▀▀ █ ▀▄▄ ▄█▀▄▄▄ ▄▄█▀ █  
-  ▀▀▀▀▀▀▀ ▀   ▀ ▀    ▀▀▀▀▀▀  
-                             `;
+import { getVaultEntry } from '../security/cryptoVault';
 
 export function createInitialVFS(): VNode {
   const now = Date.now();
@@ -97,34 +64,49 @@ Pro Tip: Watch the File Explorer on the left side update in real time!
     student.id
   );
 
-  // Obfuscated dynamic loading for Easter egg files (prevents AI web-scraping & static source leak)
+  // Cryptographically encrypted Easter egg files (Hash-based Key Derivation)
+  // Zero plaintext in source code, zero plaintext in JS bundle, zero plaintext in localStorage.
   const _d = (s: string) => atob(s);
   const sec1 = _d('LnNlY3JldF8x');
   const sec2 = _d('LnNlY3JldF8y');
 
-  student.children[sec1] = createFile(
-    sec1,
-    ` __________________________________________________
-/ Congratulations! You discovered ${sec1}!       \\
-\\ Scan the QR Code below to claim your surprise!   /
- --------------------------------------------------
+  const v1 = getVaultEntry(sec1);
+  if (v1) {
+    student.children[sec1] = {
+      id: `file_${sec1}_${Math.random().toString(36).substring(2, 9)}`,
+      name: sec1,
+      type: 'file',
+      content: '', // Zero plaintext in memory or localStorage
+      children: {},
+      parentId: student.id,
+      createdAt: now,
+      updatedAt: now,
+      permissions: '-rw-r--r--',
+      size: v1.byteLength,
+      isEncrypted: true,
+      cipherPayload: v1.cipherHex,
+      vaultKeyHash: v1.keyHash,
+    };
+  }
 
-${RICK_ROLL_QR}
-`,
-    student.id
-  );
-
-  student.children[sec2] = createFile(
-    sec2,
-    ` __________________________________________________
-/ Great job! You discovered ${sec2}!             \\
-\\ Scan the QR Code below to open the URL!          /
- --------------------------------------------------
-
-${GOOGLE_QR}
-`,
-    student.id
-  );
+  const v2 = getVaultEntry(sec2);
+  if (v2) {
+    student.children[sec2] = {
+      id: `file_${sec2}_${Math.random().toString(36).substring(2, 9)}`,
+      name: sec2,
+      type: 'file',
+      content: '', // Zero plaintext in memory or localStorage
+      children: {},
+      parentId: student.id,
+      createdAt: now,
+      updatedAt: now,
+      permissions: '-rw-r--r--',
+      size: v2.byteLength,
+      isEncrypted: true,
+      cipherPayload: v2.cipherHex,
+      vaultKeyHash: v2.keyHash,
+    };
+  }
 
   // 4. /home/student/cpe102
   const cpe102 = createDir('cpe102', student.id);

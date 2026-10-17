@@ -12,6 +12,9 @@ export interface VNode {
   permissions: string; // e.g. "drwxr-xr-x" or "-rw-r--r--"
   size: number; // in bytes
   isExecutable?: boolean;
+  isEncrypted?: boolean;
+  cipherPayload?: string;
+  vaultKeyHash?: string;
 }
 
 export interface VFSActionEffect {
