@@ -590,47 +590,47 @@ function getHelpOutput(): string {
 ──────────────────────────────────────────────────────────────────────────
 COMMAND          DESCRIPTION & EXAMPLES
 ──────────────────────────────────────────────────────────────────────────
-pwd              Print working directory (ดูตำแหน่งโฟลเดอร์ปัจจุบัน)
+pwd              Print current working directory
                  Example: pwd
 
-ls [options]     List files and directories (ดูรายชื่อไฟล์และโฟลเดอร์)
+ls [options]     List files and directories
                  Options:
-                   ls       : แสดงไฟล์ปกติ
-                   ls -F    : แสดงเครื่องหมายท้ายชื่อ (/ ท้ายโฟลเดอร์)
-                   ls -R    : แสดงโครงสร้างแบบทะลุทุกโฟลเดอร์ย่อย (Recursive)
-                   ls -l    : แสดงรายละเอียดสิทธิ์และขนาดไฟล์
+                   ls       : List normal files and directories
+                   ls -F    : Append indicator (/ for directories)
+                   ls -R    : List directory contents recursively
+                   ls -l    : Detailed long listing format
 
-cd <path>        Change directory (เปลี่ยนโฟลเดอร์)
+cd <path>        Change directory
                  Examples:
-                   cd cpe102     : เข้าโฟลเดอร์ cpe102
-                   cd ..         : ถอยหลัง 1 โฟลเดอร์
-                   cd ~ หรือ cd  : กลับบ้าน (/home/student)
-                   cd /          : ไปที่ Root Directory
+                   cd cpe102     : Enter cpe102 directory
+                   cd ..         : Go up one directory level
+                   cd ~ or cd    : Return to home directory (~ /home/student)
+                   cd /          : Go to root directory
 
-cat <file>       Concatenate & print file content (เปิดอ่านเนื้อหาในไฟล์)
+cat <file>       Concatenate and print file content
                  Example: cat welcome.txt
 
-touch <file>     Create new empty file (สร้างไฟล์เปล่าใหม่)
-                 Example: touch my_program.c
+touch <file>     Create a new empty file
+                 Example: touch program.c
 
-mkdir <dir>      Make directory (สร้างโฟลเดอร์ใหม่)
-                 Example: mkdir homework
+mkdir <dir>      Create a new directory
+                 Example: mkdir my_folder
 
-cp <src> <dst>   Copy file (คัดลอกไฟล์)
-                 Example: cp notes.txt notes_backup.txt
-cp -r <src> <dst>Copy folder recursively (คัดลอกโฟลเดอร์และไฟล์ข้างใน)
-                 Example: cp -r playground backup_play
+cp <src> <dst>   Copy file to destination
+                 Example: cp file.txt copy.txt
+cp -r <src> <dst>Copy directory recursively
+                 Example: cp -r dir1 dir2
 
-mv <src> <dst>   Move or rename file/folder (ย้ายหรือเปลี่ยนชื่อไฟล์/โฟลเดอร์)
-                 Example: mv assignment_draft.txt report_final.txt
+mv <src> <dst>   Move or rename a file or directory
+                 Example: mv old.txt new.txt
 
-rm <file>        Remove file (ลบไฟล์)
+rm <file>        Remove a file
                  Example: rm test.txt
-rm -r <dir>      Remove folder recursively (ลบโฟลเดอร์และของข้างในทั้งหมด)
-                 Example: rm -r temp_trash
+rm -r <dir>      Remove directory and its contents recursively
+                 Example: rm -r old_folder
 
-clear            Clear terminal screen (ล้างหน้าจอเทอร์มินัล)
-help             Show this reference cheat sheet
+clear            Clear terminal screen (or press Ctrl+L)
+help             Display this command reference sheet
 ──────────────────────────────────────────────────────────────────────────
-💡 Tips: สามารถกดปุ่ม Tab เพื่อเติมชื่อคำสั่งหรือไฟล์ให้อัตโนมัติได้!`;
+💡 Tips: Press Tab key anytime to auto-complete commands and filenames!`;
 }

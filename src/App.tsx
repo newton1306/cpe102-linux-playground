@@ -81,10 +81,8 @@ export function App() {
       setTerminalEntries((prev) => [...prev, newEntry]);
       setVfsState(nextState);
 
-      // If cd was executed in terminal, also sync Explorer view to the new directory!
-      if (nextState.cwd !== vfsState.cwd) {
-        setExplorerCwd(nextState.cwd);
-      }
+      // Any action from terminal (right) updates Explorer view (left) so animations and changes appear immediately
+      setExplorerCwd(nextState.cwd);
     },
     [vfsState, handleSecretFound]
   );

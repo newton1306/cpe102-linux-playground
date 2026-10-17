@@ -70,39 +70,39 @@ export function createInitialVFS(): VNode {
   const home = createDir('home', root.id);
   root.children['home'] = home;
 
-  // /home/student
+  // /home/student (Home ~)
   const student = createDir('student', home.id);
   home.children['student'] = student;
 
-  // 1. welcome.txt (Do NOT mention -a or secret)
+  // 1. welcome.txt (English greeting to freshmen engineers)
   student.children['welcome.txt'] = createFile(
     'welcome.txt',
     `================================================================
-   ยินดีต้อนรับสู่ CPE102 : Let's Try! Linux Command Playground
+   Welcome to CPE102 : Let's Try! Linux Command Playground
 ================================================================
-ยินดีต้อนรับเพื่อนๆ นักศึกษา CPE สู่โลกของ Command Line Interface (CLI)
-กิจกรรมช่วงนี้คือการลองเล่นและฝึกพิมพ์คำสั่งไปพร้อมกับอาจารย์ในห้องเรียน!
+Welcome freshmen computer engineers to the world of CLI!
+This interactive session is designed for you to follow along
+and practice Linux commands live with your instructor.
 
-ลองเริ่มทดลองด้วยคำสั่งพื้นฐานต่อไปนี้:
-  1. pwd         : ตรวจสอบตำแหน่งโฟลเดอร์ที่เรากำลังยืนอยู่
-  2. ls          : สำรวจดูรายชื่อไฟล์และโฟลเดอร์รอบตัว
-  3. cat <file>  : เปิดอ่านข้อความข้างในไฟล์
-  4. cd <folder> : เดินทางเข้าสู่โฟลเดอร์อื่น (เช่น cd cpe102 หรือ cd ..)
-  5. help        : เปิดดูโพยสรุปคำสั่งทั้งหมดที่มีในระบบ
+Try starting with these essential commands:
+  1. pwd         : Print your current working directory
+  2. ls          : List files and directories around you
+  3. cat <file>  : Read and display file contents
+  4. cd <folder> : Navigate into a directory (e.g., cd cpe102 or cd ..)
+  5. help        : Open the command cheat sheet
 
-เคล็ดลับ: สังเกตหน้าจอฝั่งซ้าย (File Explorer) ทุกครั้งที่พิมพ์คำสั่ง
-คุณจะเห็นการเปลี่ยนแปลงเกิดขึ้นแบบ Real-Time!
+Pro Tip: Watch the File Explorer on the left side update in real time!
 ================================================================
 `,
     student.id
   );
 
-  // 2. .secret_1 (Scannable Rick Roll QR code, HINT removed)
+  // 2. .secret_1 (Scannable Rick Roll QR code, English header, no hint)
   student.children['.secret_1'] = createFile(
     '.secret_1',
     ` __________________________________________________
-/ 🎉 ยอดเยี่ยมมาก! คุณค้นพบไฟล์ลับ .secret_1 สำเร็จ! \\
-\\ สแกน QR Code ด้านล่างนี้เพื่อเปิดดูความลับพิเศษ!   /
+/ Congratulations! You discovered .secret_1!       \\
+\\ Scan the QR Code below to claim your surprise!   /
  --------------------------------------------------
 
 ${RICK_ROLL_QR}
@@ -110,12 +110,12 @@ ${RICK_ROLL_QR}
     student.id
   );
 
-  // 3. .secret_2 (Scannable Google.com QR code)
+  // 3. .secret_2 (Scannable Google.com QR code, English header)
   student.children['.secret_2'] = createFile(
     '.secret_2',
     ` __________________________________________________
-/ 🔍 คุณค้นพบไฟล์ลับ .secret_2 สำเร็จ!             \\
-\\ สแกน QR Code ด้านล่างนี้เพื่อเปิดดูข้อมูล!       /
+/ Great job! You discovered .secret_2!             \\
+\\ Scan the QR Code below to open the URL!          /
  --------------------------------------------------
 
 ${GOOGLE_QR}

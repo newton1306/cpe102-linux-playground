@@ -1,5 +1,6 @@
 import React from 'react';
 import type { VNode } from '../../types/vfs';
+import { formatPromptPath } from '../../vfs/pathUtils';
 
 interface StatusBarProps {
   currentDir: VNode | null;
@@ -28,10 +29,10 @@ export const StatusBar: React.FC<StatusBarProps> = ({ currentDir, selectedNode, 
         )}
       </div>
 
-      {/* Right: Linux CWD */}
+      {/* Right: Terminal CWD */}
       <div className="flex items-center gap-1.5 text-slate-400">
-        <span className="text-slate-600">CWD:</span>
-        <code className="text-emerald-400 font-semibold">{cwd}</code>
+        <span className="text-slate-600">Terminal CWD:</span>
+        <code className="text-emerald-400 font-semibold">{formatPromptPath(cwd)}</code>
       </div>
     </footer>
   );

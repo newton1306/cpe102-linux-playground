@@ -20,6 +20,7 @@ export const Terminal: React.FC<TerminalProps> = ({
   onClear,
 }) => {
   const [inputVal, setInputVal] = useState('');
+  const [caretPos, setCaretPos] = useState(0);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -68,6 +69,16 @@ export const Terminal: React.FC<TerminalProps> = ({
     inputRef.current?.focus({ preventScroll: true });
   };
 
+  const updateCaret = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    const target = e.currentTarget;
+    setCaretPos(target.selectionStart ?? target.value.length);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputVal(e.target.value);
+    setCaretPos(e.target.selectionStart ?? e.target.value.length);
+  };
+
   // Keyboard navigation & Shortcuts (Up/Down history, Tab completion, Ctrl+L)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // Ctrl+L to clear screen
@@ -88,7 +99,9 @@ export const Terminal: React.FC<TerminalProps> = ({
           : Math.max(0, historyIndex - 1);
 
       setHistoryIndex(nextIdx);
-      setInputVal(entries[nextIdx].command);
+      const cmd = entries[nextIdx].command;
+      setInputVal(cmd);
+      setCaretPos(cmd.length);
       return;
     }
 
@@ -100,10 +113,13 @@ export const Terminal: React.FC<TerminalProps> = ({
       if (historyIndex < entries.length - 1) {
         const nextIdx = historyIndex + 1;
         setHistoryIndex(nextIdx);
-        setInputVal(entries[nextIdx].command);
+        const cmd = entries[nextIdx].command;
+        setInputVal(cmd);
+        setCaretPos(cmd.length);
       } else {
         setHistoryIndex(null);
         setInputVal('');
+        setCaretPos(0);
       }
       return;
     }
@@ -121,6 +137,7 @@ export const Terminal: React.FC<TerminalProps> = ({
       const cmd = inputVal.trim();
       setHistoryIndex(null);
       setInputVal('');
+      setCaretPos(0);
       onExecute(cmd);
     }
   };
@@ -137,7 +154,9 @@ export const Terminal: React.FC<TerminalProps> = ({
       const prefix = parts[0].toLowerCase();
       const matches = AVAILABLE_COMMANDS.filter((cmd) => cmd.startsWith(prefix));
       if (matches.length === 1) {
-        setInputVal(matches[0] + ' ');
+        const completed = matches[0] + ' ';
+        setInputVal(completed);
+        setCaretPos(completed.length);
       }
       return;
     }
@@ -154,7 +173,9 @@ export const Terminal: React.FC<TerminalProps> = ({
       parts[parts.length - 1] = matches[0];
       const child = currentDir.children[matches[0]];
       const suffix = child?.type === 'dir' ? '/' : ' ';
-      setInputVal(parts.join(' ') + suffix);
+      const completed = parts.join(' ') + suffix;
+      setInputVal(completed);
+      setCaretPos(completed.length);
     }
   };
 
@@ -257,7 +278,7 @@ export const Terminal: React.FC<TerminalProps> = ({
         className="flex-1 p-3 overflow-y-auto space-y-3 overscroll-contain"
       >
         {/* Welcome Banner */}
-        <div className="text-slate-400 pb-2 border-b border-slate-800/80 space-y-1">
+        <div className="text-slate-400 pb-2 border-b border-slate-800/80 space-y-1 select-none">
           <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm text-glow-green">
             <span>⚡ CPE102 Interactive Linux Terminal</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-emerald-300">
@@ -265,10 +286,10 @@ export const Terminal: React.FC<TerminalProps> = ({
             </span>
           </div>
           <p className="text-slate-400 text-xs">
-            ยินดีต้อนรับเข้าสู่ช่วง <span className="text-emerald-400 font-semibold">Let's Try!</span> พิมพ์คำสั่งไปพร้อมกับอาจารย์ได้เลย!
+            Welcome to the <span className="text-emerald-400 font-semibold">Let's Try!</span> session. Follow along and type commands with your instructor!
           </p>
           <p className="text-slate-500 text-[11px]">
-            พิมพ์ <code className="text-cyan-400 font-semibold">help</code> เพื่อดูโพยคำสั่ง | กด <code className="text-cyan-400">Tab</code> เพื่อเติมคำอัตโนมัติ
+            Type <code className="text-cyan-400 font-semibold">help</code> for the command reference sheet | Press <code className="text-cyan-400">Tab</code> to auto-complete
           </p>
         </div>
 
@@ -276,12 +297,12 @@ export const Terminal: React.FC<TerminalProps> = ({
         {entries.map((entry) => (
           <div key={entry.id} className="space-y-1">
             {/* Prompt Line */}
-            <div className="flex items-center gap-1 flex-wrap">
+            <div className="flex items-center flex-wrap font-mono text-xs">
               <span className="text-emerald-400 font-bold">student@cpe102</span>
               <span className="text-slate-500">:</span>
               <span className="text-blue-400 font-bold">{formatPromptPath(entry.cwd)}</span>
-              <span className="text-slate-400 font-bold">$</span>
-              <span className="text-slate-100 ml-1">{entry.command}</span>
+              <span className="text-slate-400 font-bold mr-1.5">$</span>
+              <span className="text-slate-100">{entry.command}</span>
             </div>
 
             {/* Command Output */}
@@ -296,26 +317,41 @@ export const Terminal: React.FC<TerminalProps> = ({
           </div>
         ))}
 
-        {/* Active Command Line Input with Continuous Blinking Cursor */}
-        <div className="flex items-center gap-1 flex-wrap pt-1">
+        {/* Active Command Line Input with Continuous Blinking Block Cursor */}
+        <div
+          className="flex items-center flex-wrap pt-1 font-mono text-xs cursor-text"
+          onClick={() => inputRef.current?.focus({ preventScroll: true })}
+        >
           <span className="text-emerald-400 font-bold">student@cpe102</span>
           <span className="text-slate-500">:</span>
           <span className="text-blue-400 font-bold">{currentPromptPath}</span>
-          <span className="text-slate-400 font-bold">$</span>
-          <div className="flex-1 min-w-[200px] flex items-center relative">
+          <span className="text-slate-400 font-bold mr-1.5">$</span>
+
+          <div className="relative inline-flex items-center min-w-[8px]">
             <input
               ref={inputRef}
               type="text"
               value={inputVal}
-              onChange={(e) => setInputVal(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              className="w-full bg-transparent border-none outline-none text-emerald-300 font-mono text-xs px-1 caret-emerald-400"
+              onSelect={updateCaret}
+              onKeyUp={updateCaret}
+              onClick={updateCaret}
+              className="absolute inset-0 opacity-0 w-full cursor-text z-10 caret-transparent font-mono text-xs"
               autoFocus
               spellCheck={false}
               autoComplete="off"
             />
-            {/* Visible pulsing neon cursor block indicator */}
-            <span className="inline-block w-2 h-3.5 bg-emerald-400 animate-pulse ml-0.5 glow-green-sm" />
+            {/* Text before cursor */}
+            <span className="text-emerald-300 whitespace-pre select-text">
+              {inputVal.slice(0, caretPos)}
+            </span>
+            {/* Single continuous blinking block cursor right at insertion point */}
+            <span className="inline-block w-2 h-3.5 bg-emerald-400 animate-pulse glow-green-sm select-none" />
+            {/* Text after cursor */}
+            <span className="text-emerald-300 whitespace-pre select-text">
+              {inputVal.slice(caretPos)}
+            </span>
           </div>
         </div>
 

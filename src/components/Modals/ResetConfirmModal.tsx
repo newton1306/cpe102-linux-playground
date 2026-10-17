@@ -34,14 +34,14 @@ export const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({
         {/* Content */}
         <div className="space-y-3 font-mono text-sm text-slate-300">
           <p className="leading-relaxed">
-            ต้องการรีเซ็ต <span className="text-emerald-400 font-bold">Playground</span> กลับเป็นค่าเริ่มต้นใช่หรือไม่?
+            Are you sure you want to reset your <span className="text-emerald-400 font-bold">Playground</span> back to default?
           </p>
           <div className="rounded border border-red-900/50 bg-red-950/20 p-3 text-xs text-red-300 space-y-1">
-            <p className="font-semibold text-red-400">⚠️ สิ่งที่จะเกิดขึ้น:</p>
+            <p className="font-semibold text-red-400">⚠️ What will happen:</p>
             <ul className="list-disc list-inside space-y-0.5 text-slate-400">
-              <li>ไฟล์และโฟลเดอร์ที่คุณสร้างขึ้นจะถูกล้างออก</li>
-              <li>โครงสร้างไฟล์ตั้งต้น (Initial Files) จะถูกโหลดกลับมาใหม่</li>
-              <li>ตำแหน่งจะกลับไปที่บ้าน (<code className="text-emerald-400">~ /home/student</code>)</li>
+              <li>All files and folders you created will be wiped</li>
+              <li>Initial default files and structure will be restored</li>
+              <li>Working directory will return to home (<code className="text-emerald-400">~ /home/student</code>)</li>
             </ul>
           </div>
         </div>
@@ -52,7 +52,7 @@ export const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 rounded border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all cursor-pointer"
           >
-            ยกเลิก (Cancel)
+            Cancel
           </button>
           <button
             onClick={() => {
@@ -62,7 +62,7 @@ export const ResetConfirmModal: React.FC<ResetConfirmModalProps> = ({
             className="flex items-center gap-1.5 px-4 py-2 rounded border border-red-500 bg-red-600/90 text-white font-semibold hover:bg-red-500 shadow-lg shadow-red-950/60 transition-all cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>ยืนยันการ Reset Session</span>
+            <span>Yes, Reset Session</span>
           </button>
         </div>
       </div>
